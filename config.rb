@@ -56,7 +56,7 @@ class Config
 
   def debug
     if @config[:debug].nil?
-      @config[:debug] = @secrets['debug']
+      @config[:debug] = ENV['DEBUG'] || @secrets['debug']
     else
       @config[:debug]
     end
