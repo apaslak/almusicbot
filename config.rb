@@ -1,6 +1,17 @@
 require 'yaml'
 
+# Loads in configuration variables from a file or ENV
 class Config
+  CONFIG_VARS = [
+    :database_url,
+    :discord_token,
+    :discord_client_id,
+    :yt_refresh_token,
+    :yt_client_id,
+    :yt_client_secret,
+    :debug
+  ].freeze
+
   def initialize
     load_config_from_file
     @config = {}
@@ -20,6 +31,7 @@ class Config
   end
 
   private
+
   def load_config_from_file
     secrets_file = 'secrets.yml'
     if File.file?(secrets_file)

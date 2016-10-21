@@ -1,19 +1,22 @@
+# Module that handles listening for youtube links
+# and adding them to an appropriate youtube playlist
 module DailyMusicPlaylist
   extend Discordrb::EventContainer
-  CHANNELS = [ 'music' ]
+  CHANNELS = ['music'].freeze
 
   def self.listening_to(channel_name)
     CHANNELS.include?(channel_name)
   end
 
-  def self.get_last_playlist
-    result = database_connection["SELECT * FROM playlists ORDER by id DESC LIMIT 1"]
+  def self.last_playlist
+    query = 'SELECT * FROM playlists ORDER by id DESC LIMIT 1'
+    result = database_connection[query]
     result.first
   end
 
-  def self.get_video_id_from_message(message)
-    youtube_regex = /(https?:\/\/(www\.)?youtube.com\/watch\?)v=([^\&]+)/
-    short_yt_regex = /(https?:\/\/(www\.)?youtu\.be\/)([^\?]+)/
+  def self.video_id_from_message(message)
+    youtube_regex = %r{(https?:\/\/(www\.)?youtube.com\/watch\?)v=([^\&]+)}
+    short_yt_regex = %r{(https?:\/\/(www\.)?youtu\.be\/)([^\?]+)}
     matched = youtube_regex.match(message) || short_yt_regex.match(message)
     matched[3] if matched
   end
@@ -33,11 +36,9 @@ module DailyMusicPlaylist
 
   def self.do_work(video_id)
     todays_date = Time.now.strftime('%m/%d/%Y')
-    last_playlist = get_last_playlist
+    last_playlist = last_playlist
 
-    if last_playlist && last_playlist[:yt_id] == video_id
-      puts 'skipped'
-    end
+    puts 'skipped' if last_playlist && last_playlist[:yt_id] == video_id
 
     yt_id = find_playlist(todays_date, last_playlist)
     add_video(yt_id, video_id)
@@ -45,7 +46,7 @@ module DailyMusicPlaylist
 
   message(containing: 'youtube.com/') do |event|
     if listening_to(event.channel.name)
-      video_id = get_video_id_from_message(event.message.content)
+      video_id = video_id_from_message(event.message.content)
       do_work(video_id)
       event.respond 'added' if BOT.config.debug
     end
@@ -53,7 +54,8 @@ module DailyMusicPlaylist
 
   message(exact_text: '!daily_playlist') do |event|
     if listening_to(event.channel.name)
-      event.respond "https://www.youtube.com/playlist?list=#{get_last_playlist[:yt_id]}"
+      url = "https://www.youtube.com/playlist?list=#{last_playlist[:yt_id]}"
+      event.respond url
     end
   end
 end

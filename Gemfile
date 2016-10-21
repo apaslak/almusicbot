@@ -7,4 +7,5 @@ source 'https://rubygems.org' do
   gem 'sequel'
   gem 'pry'
   gem 'rspec'
+  gem 'rubocop', require: false
 end

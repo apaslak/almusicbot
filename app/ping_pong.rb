@@ -1,3 +1,4 @@
+# Basic request/response testing
 module PingPong
   extend Discordrb::EventContainer
 
