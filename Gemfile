@@ -5,4 +5,6 @@ source 'https://rubygems.org' do
   gem 'pg'
   gem 'rest-client', '~> 2.0'
   gem 'sequel'
+  gem 'pry'
+  gem 'rspec'
 end
