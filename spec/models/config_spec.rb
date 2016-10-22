@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../config'
+require_relative '../../models/config'
 
 %w(database_url
    discord_token

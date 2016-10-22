@@ -1,1 +1,1 @@
-worker: ruby discord_bot.rb
+worker: ruby run.rb
