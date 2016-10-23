@@ -8,7 +8,8 @@ require_relative '../../models/config'
    yt_refresh_token
    yt_client_id
    yt_client_secret
-   debug).each do |secret|
+   debug
+   privacy_status).each do |secret|
   RSpec.describe Config, "##{secret}" do
     subject { Config.new }
 

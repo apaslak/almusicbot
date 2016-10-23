@@ -5,9 +5,16 @@ require_relative '../../resources/video_management'
 
 RSpec.describe VideoManagement do
   let(:database_connection) { double('connection') }
+  let(:bot) do
+    OpenStruct.new(config: OpenStruct.new(yt_client_id: 123_45,
+                                          yt_client_secret: 'itsasecret',
+                                          yt_refresh_token: 'itsarefreshtoken',
+                                          privacy_status: 'public'))
+  end
 
   before do
     allow(DatabaseConnection).to receive(:connection).and_return(database_connection)
+    stub_const('BOT', bot)
   end
 
   describe '#playlist_url' do
@@ -43,11 +50,6 @@ RSpec.describe VideoManagement do
   end
 
   describe '#refresh_access_token' do
-    let(:bot) do
-      OpenStruct.new(config: OpenStruct.new(yt_client_id: 123_45,
-                                            yt_client_secret: 'itsasecret',
-                                            yt_refresh_token: 'itsarefreshtoken'))
-    end
     let(:url) { 'https://accounts.google.com/o/oauth2/token' }
     let(:body) do
       { grant_type: 'refresh_token',
@@ -60,7 +62,6 @@ RSpec.describe VideoManagement do
     let(:access_token_db) { double('access_token_db') }
 
     before do
-      stub_const('BOT', bot)
       allow(DateTime).to receive(:now).and_return(now)
       allow(RestClientWrapper).to receive(:post)
         .with(url, body, headers).and_return(access_token: 'accesstoken')

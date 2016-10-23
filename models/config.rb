@@ -9,7 +9,8 @@ class Config
     :yt_refresh_token,
     :yt_client_id,
     :yt_client_secret,
-    :debug
+    :debug,
+    :privacy_status
   ].freeze
 
   def initialize

@@ -41,7 +41,7 @@ module VideoManagement
   def self.create_new_playlist(title)
     body = {
       snippet: { title: title },
-      status: { privacyStatus: 'public' }
+      status: { privacyStatus: BOT.config.privacy_status }
     }
     headers = { 'Authorization': "Bearer #{access_token}",
                 'Content-Type': 'application/json' }
