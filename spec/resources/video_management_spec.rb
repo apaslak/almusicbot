@@ -87,6 +87,7 @@ RSpec.describe VideoManagement do
       { snippet: { title: title },
         status: { privacyStatus: 'public' } }
     end
+    let(:json_body) { JSON.generate(body) }
     let(:url) { 'https://www.googleapis.com/youtube/v3/playlists?part=snippet,status' }
     let(:access_token) { double('access_token') }
     let(:headers) do
@@ -100,7 +101,7 @@ RSpec.describe VideoManagement do
     before do
       allow(subject).to receive(:playlist_url).and_return(url)
       allow(RestClientWrapper).to receive(:post)
-        .with(url, body, headers).and_return(id: playlist_id)
+        .with(url, json_body, headers).and_return(id: playlist_id)
       allow(subject).to receive(:access_token).and_return(access_token)
       allow(database_connection).to receive(:[])
         .with(:playlists).and_return(playlist_db)
@@ -119,6 +120,7 @@ RSpec.describe VideoManagement do
   end
 
   describe '#add_video' do
+    let(:recommended_by) { 'Meeko' }
     let(:yt_id) { 'youtubeid' }
     let(:video_id) { 'videoid' }
     let(:body) do
@@ -129,10 +131,13 @@ RSpec.describe VideoManagement do
             kind: 'youtube#video',
             videoId: video_id
           }
+        },
+        contentDetails: {
+          note: "recommended by #{recommended_by}"
         }
       )
     end
-    let(:url) { 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet' }
+    let(:url) { 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails' }
     let(:access_token) { double('access_token') }
     let(:headers) do
       { 'Authorization': "Bearer #{access_token}",
@@ -147,7 +152,7 @@ RSpec.describe VideoManagement do
     it 'adds the video to the playlist' do
       expect(RestClientWrapper).to receive(:post)
         .with(url, body, headers)
-      subject.add_video(yt_id, video_id)
+      subject.add_video(yt_id, video_id, recommended_by)
     end
   end
 

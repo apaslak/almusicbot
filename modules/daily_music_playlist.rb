@@ -34,7 +34,7 @@ module DailyMusicPlaylist
     end
   end
 
-  def self.do_work(video_id)
+  def self.do_work(video_id, recommended_by)
     todays_date = Time.now.strftime('%m/%d/%Y')
     last_playlist = VideoManagement.last_playlist
 
@@ -44,15 +44,19 @@ module DailyMusicPlaylist
     end
 
     yt_id = find_playlist_id(todays_date, last_playlist)
-    VideoManagement.add_video(yt_id, video_id)
+    VideoManagement.add_video(yt_id, video_id, recommended_by)
   end
 
   message(containing: 'youtube.com/') do |event|
     if listening_to(event.channel.name)
       video_id = video_id_from_message(event.message.content)
-      do_work(video_id)
+      do_work(video_id, event.user.username)
       event.respond 'added' if BOT.config.debug
     end
+  end
+
+  message(containing: 'foo') do |event|
+    puts "event: #{event.user.username.inspect}"
   end
 
   message(exact_text: '!daily_playlist') do |event|

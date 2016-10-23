@@ -137,6 +137,7 @@ RSpec.describe DailyMusicPlaylist do
   end
 
   describe '#do_work' do
+    let(:recommended_by) { 'Meeko' }
     let(:todays_date) { Time.now.strftime('%m/%d/%Y') }
     let(:video_id) { 'ReXRXxbeZ_I' }
     let(:last_playlist) { { title: todays_date, yt_id: 'foo_id' } }
@@ -145,22 +146,24 @@ RSpec.describe DailyMusicPlaylist do
       allow(VideoManagement).to receive(:last_playlist).and_return(last_playlist)
       allow(subject).to receive(:find_playlist_id).with(todays_date, last_playlist)
         .and_return(last_playlist[:yt_id])
-      allow(VideoManagement).to receive(:add_video).with(last_playlist[:yt_id], video_id)
+      allow(VideoManagement).to receive(:add_video)
+        .with(last_playlist[:yt_id], video_id, recommended_by)
     end
 
     it 'finds the playlist' do
-      subject.do_work('ReXRXxbeZ_I')
+      subject.do_work('ReXRXxbeZ_I', recommended_by)
       expect(subject).to have_received(:find_playlist_id).with(todays_date, last_playlist)
     end
 
     it 'adds the video to the playlist' do
-      subject.do_work('ReXRXxbeZ_I')
-      expect(VideoManagement).to have_received(:add_video).with(last_playlist[:yt_id], video_id)
+      subject.do_work('ReXRXxbeZ_I', recommended_by)
+      expect(VideoManagement).to have_received(:add_video)
+        .with(last_playlist[:yt_id], video_id, recommended_by)
     end
 
     context 'recommended video link is the daily playlist' do
       before do
-        subject.do_work(last_playlist[:yt_id])
+        subject.do_work(last_playlist[:yt_id], recommended_by)
       end
 
       it 'does not try to find the playlist' do

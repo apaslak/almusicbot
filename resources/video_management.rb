@@ -45,25 +45,30 @@ module VideoManagement
     }
     headers = { 'Authorization': "Bearer #{access_token}",
                 'Content-Type': 'application/json' }
-    response = RestClientWrapper.post(playlist_url('playlists', 'snippet,status'), JSON.generate(body), headers)
+    url = playlist_url('playlists', 'snippet,status')
+    response = RestClientWrapper.post(url, JSON.generate(body), headers)
     playlist = { title: title, yt_id: response[:id] }
     DatabaseConnection.connection[:playlists].insert(playlist)
     playlist
   end
 
-  def self.add_video(yt_id, video_id)
+  def self.add_video(yt_id, video_id, recommended_by)
     body = {
-      'snippet': {
-        'playlistId': yt_id,
-        'resourceId': {
-          'kind': 'youtube#video',
-          'videoId': video_id
+      snippet: {
+        playlistId: yt_id,
+        resourceId: {
+          kind: 'youtube#video',
+          videoId: video_id
         }
+      },
+      contentDetails: {
+        note: "recommended by #{recommended_by}"
       }
     }
     headers = { 'Authorization': "Bearer #{access_token}",
                 'Content-Type': 'application/json' }
-    RestClientWrapper.post(playlist_url('playlistItems', 'snippet'), JSON.generate(body), headers)
+    url = playlist_url('playlistItems', 'snippet,contentDetails')
+    RestClientWrapper.post(url, JSON.generate(body), headers)
   end
 
   def self.last_playlist
