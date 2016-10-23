@@ -11,6 +11,5 @@ require_relative 'modules/ping_pong'
 
 BOT = DiscordBot.new
 BOT.bot.include! DailyMusicPlaylist
-BOT.bot.include! PingPong
 
 BOT.bot.run
