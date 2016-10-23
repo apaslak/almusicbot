@@ -45,7 +45,7 @@ module VideoManagement
     }
     headers = { 'Authorization': "Bearer #{access_token}",
                 'Content-Type': 'application/json' }
-    response = RestClientWrapper.post(playlist_url('playlists', 'snippet,status'), body, headers)
+    response = RestClientWrapper.post(playlist_url('playlists', 'snippet,status'), JSON.generate(body), headers)
     playlist = { title: title, yt_id: response[:id] }
     DatabaseConnection.connection[:playlists].insert(playlist)
     playlist
