@@ -47,16 +47,15 @@ module DailyMusicPlaylist
     VideoManagement.add_video(yt_id, video_id, recommended_by)
   end
 
-  message(containing: 'youtube.com/') do |event|
-    if listening_to(event.channel.name)
-      video_id = video_id_from_message(event.message.content)
-      do_work(video_id, event.user.username)
-      event.respond 'added' if BOT.config.debug
+  %w(youtube.com/
+     youtu.be/).each do |url|
+    message(containing: url) do |event|
+      if listening_to(event.channel.name)
+        video_id = video_id_from_message(event.message.content)
+        do_work(video_id, event.user.username)
+        event.respond 'added' if BOT.config.debug
+      end
     end
-  end
-
-  message(containing: 'foo') do |event|
-    puts "event: #{event.user.username.inspect}"
   end
 
   message(exact_text: '!daily_playlist') do |event|
